@@ -10,6 +10,7 @@ describe('builtinToolSelectors', () => {
       const state = {
         ...initialState,
         builtinTools: [{ identifier: 'tool-1', manifest: { meta: { title: 'Tool 1' } } }],
+        installedBuiltinTools: ['tool-1'],
       } as ToolStoreState;
       const result = builtinToolSelectors.metaList(state);
       expect(result).toEqual([
