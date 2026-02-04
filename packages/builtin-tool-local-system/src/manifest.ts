@@ -367,6 +367,7 @@ export const LocalSystemManifest: BuiltinToolManifest = {
   identifier: LocalSystemIdentifier,
   meta: {
     avatar: '📁',
+    description: 'Access and manage local files, run shell commands on your desktop',
     title: 'Local System',
   },
   systemRole: systemPrompt,

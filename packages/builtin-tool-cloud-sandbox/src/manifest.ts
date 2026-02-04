@@ -327,6 +327,7 @@ export const CloudSandboxManifest: BuiltinToolManifest = {
   identifier: CloudSandboxIdentifier,
   meta: {
     avatar: '💻',
+    description: 'Execute code, run commands, and manage files in a secure cloud environment',
     title: 'Cloud Sandbox',
   },
   systemRole: systemPrompt,

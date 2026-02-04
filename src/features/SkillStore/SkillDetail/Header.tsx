@@ -1,6 +1,6 @@
 'use client';
 
-import { Flexbox, Icon, Text, useModalContext } from '@lobehub/ui';
+import { Avatar, Flexbox, Icon, Text, useModalContext } from '@lobehub/ui';
 import { Button } from 'antd';
 import { cssVar } from 'antd-style';
 import { Loader2, SquareArrowOutUpRight } from 'lucide-react';
@@ -12,8 +12,18 @@ import { useSkillConnect } from '@/features/SkillStore/SkillList/LobeHub/useSkil
 import { useDetailContext } from './DetailContext';
 import { ICON_SIZE, styles } from './styles';
 
+// Check if a string is likely an emoji or short text (not a URL or icon component)
+const isEmojiOrText = (str: string): boolean => {
+  // If it starts with http/https or contains common image extensions, it's a URL
+  if (/^https?:\/\//.test(str) || /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(str)) {
+    return false;
+  }
+  // Short strings (<=4 chars) are likely emojis or short text
+  return str.length <= 4;
+};
+
 interface HeaderProps {
-  type: 'klavis' | 'lobehub';
+  type: 'builtin' | 'klavis' | 'lobehub';
 }
 
 const Header = memo<HeaderProps>(({ type }) => {
@@ -22,6 +32,8 @@ const Header = memo<HeaderProps>(({ type }) => {
   const { identifier, serverName, icon, label, localizedDescription, isConnected } =
     useDetailContext();
 
+  // Only use skill connect hook for non-builtin types
+  const isBuiltin = type === 'builtin';
   const {
     handleConnect,
     isConnecting,
@@ -29,16 +41,16 @@ const Header = memo<HeaderProps>(({ type }) => {
   } = useSkillConnect({
     identifier,
     serverName,
-    type,
+    type: isBuiltin ? 'lobehub' : type, // Use lobehub as fallback for builtin
   });
 
   const hasTriggeredConnectRef = useRef(false);
 
   useEffect(() => {
-    if (hasTriggeredConnectRef.current && hookIsConnected) {
+    if (!isBuiltin && hasTriggeredConnectRef.current && hookIsConnected) {
       close();
     }
-  }, [hookIsConnected, close]);
+  }, [hookIsConnected, close, isBuiltin]);
 
   const handleConnectWithTracking = async () => {
     hasTriggeredConnectRef.current = true;
@@ -47,6 +59,10 @@ const Header = memo<HeaderProps>(({ type }) => {
 
   const renderIcon = () => {
     if (typeof icon === 'string') {
+      // Use Avatar for emoji/text avatars, img for URLs
+      if (isEmojiOrText(icon)) {
+        return <Avatar avatar={icon} size={ICON_SIZE} />;
+      }
       return (
         <img
           alt={label}
@@ -59,7 +75,8 @@ const Header = memo<HeaderProps>(({ type }) => {
   };
 
   const renderConnectButton = () => {
-    if (isConnected) return null;
+    // Builtin tools are always available, no connect button needed
+    if (isBuiltin || isConnected) return null;
 
     if (isConnecting) {
       return (

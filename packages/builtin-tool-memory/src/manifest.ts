@@ -812,6 +812,7 @@ export const MemoryManifest: BuiltinToolManifest = {
   identifier: 'lobe-user-memory',
   meta: {
     avatar: '🧠',
+    description: 'Remember user preferences, activities, and experiences across conversations',
     title: 'Memory',
   },
   systemRole: systemPrompt,
