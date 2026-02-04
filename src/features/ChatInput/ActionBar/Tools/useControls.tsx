@@ -53,15 +53,21 @@ export const useControls = ({ setUpdating }: { setUpdating: (updating: boolean) 
   const allLobehubSkillServers = useToolStore(lobehubSkillStoreSelectors.getServers, isEqual);
   const isLobehubSkillEnabled = useServerConfigStore(serverConfigSelectors.enableLobehubSkill);
 
-  const [useFetchPluginStore, useFetchUserKlavisServers, useFetchLobehubSkillConnections] =
-    useToolStore((s) => [
-      s.useFetchPluginStore,
-      s.useFetchUserKlavisServers,
-      s.useFetchLobehubSkillConnections,
-    ]);
+  const [
+    useFetchPluginStore,
+    useFetchUserKlavisServers,
+    useFetchLobehubSkillConnections,
+    useFetchInstalledBuiltinTools,
+  ] = useToolStore((s) => [
+    s.useFetchPluginStore,
+    s.useFetchUserKlavisServers,
+    s.useFetchLobehubSkillConnections,
+    s.useFetchInstalledBuiltinTools,
+  ]);
 
   useFetchPluginStore();
   useFetchInstalledPlugins();
+  useFetchInstalledBuiltinTools(true);
   useCheckPluginsIsInstalled(plugins);
 
   // 使用 SWR 加载用户的 Klavis 集成（从数据库）

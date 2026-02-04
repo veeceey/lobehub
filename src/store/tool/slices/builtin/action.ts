@@ -1,6 +1,9 @@
 import debug from 'debug';
+import useSWR, { type SWRResponse } from 'swr';
 
 import type {StoreSetter} from '@/store/types';
+import { mutate } from '@/libs/swr';
+import { userService } from '@/services/user'
 import { setNamespace } from '@/utils/storeDebug';
 
 import type {ToolStore} from '../../store';
@@ -9,6 +12,8 @@ import type { BuiltinToolContext, BuiltinToolResult } from './types';
 
 const n = setNamespace('builtinTool');
 const log = debug('lobe-store:builtin-tool');
+
+const INSTALLED_BUILTIN_TOOLS = 'loadInstalledBuiltinTools';
 
 /**
  * Builtin Tool Action Interface
@@ -89,6 +94,83 @@ export class BuiltinToolActionImpl {
       toggleBuiltinToolLoading(key, false);
       throw e;
     }
+  };
+
+  // ========== Installed Builtin Tools Management ==========
+
+  /**
+   * Install a builtin tool by adding it to the installed list
+   */
+  installBuiltinTool = async (identifier: string): Promise<void> => {
+    const currentInstalled = this.#get().installedBuiltinTools;
+
+    if (currentInstalled.includes(identifier)) return;
+
+    const newInstalled = [...currentInstalled, identifier];
+
+    // Optimistic update
+    this.#set({ installedBuiltinTools: newInstalled }, false, n('installBuiltinTool'));
+
+    // Persist to user settings
+    await userService.updateUserSettings({
+      tool: { installedBuiltinTools: newInstalled },
+    });
+
+    // Refresh to ensure consistency
+    await this.refreshInstalledBuiltinTools();
+  };
+
+  /**
+   * Uninstall a builtin tool by removing it from the installed list
+   */
+  uninstallBuiltinTool = async (identifier: string): Promise<void> => {
+    const currentInstalled = this.#get().installedBuiltinTools;
+
+    if (!currentInstalled.includes(identifier)) return;
+
+    const newInstalled = currentInstalled.filter((id) => id !== identifier);
+
+    // Optimistic update
+    this.#set({ installedBuiltinTools: newInstalled }, false, n('uninstallBuiltinTool'));
+
+    // Persist to user settings
+    await userService.updateUserSettings({
+      tool: { installedBuiltinTools: newInstalled },
+    });
+
+    // Refresh to ensure consistency
+    await this.refreshInstalledBuiltinTools();
+  };
+
+  /**
+   * Refresh installed builtin tools from server
+   */
+  refreshInstalledBuiltinTools = async (): Promise<void> => {
+    await mutate(INSTALLED_BUILTIN_TOOLS);
+  };
+
+  /**
+   * SWR hook to fetch installed builtin tools
+   */
+  useFetchInstalledBuiltinTools = (enabled: boolean): SWRResponse<string[]> => {
+    return useSWR<string[]>(
+      enabled ? INSTALLED_BUILTIN_TOOLS : null,
+      async () => {
+        const userState = await userService.getUserState();
+        return userState?.settings?.tool?.installedBuiltinTools || [];
+      },
+      {
+        fallbackData: [],
+        onSuccess: (data) => {
+          this.#set(
+            { installedBuiltinTools: data, installedBuiltinToolsLoading: false },
+            false,
+            n('useFetchInstalledBuiltinTools'),
+          );
+        },
+        revalidateOnFocus: false,
+      },
+    );
   };
 }
 

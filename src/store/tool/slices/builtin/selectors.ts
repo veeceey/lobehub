@@ -50,8 +50,11 @@ const getKlavisMetasWithAvailability = (s: ToolStoreState): LobeToolMetaWithAvai
 /**
  * Get visible builtin tools meta list (excludes hidden tools)
  * Used for general tool display in chat input bar
+ * Only returns tools that are installed (in installedBuiltinTools list)
  */
 const metaList = (s: ToolStoreState): LobeToolMeta[] => {
+  const { installedBuiltinTools } = s;
+
   const builtinMetas = s.builtinTools
     .filter((item) => {
       // Filter hidden tools
@@ -59,6 +62,11 @@ const metaList = (s: ToolStoreState): LobeToolMeta[] => {
 
       // Filter platform-specific tools (e.g., LocalSystem desktop-only)
       if (!shouldEnableTool(item.identifier)) return false;
+
+      // Only include installed tools
+      if (!installedBuiltinTools.includes(item.identifier)) {
+        return false;
+      }
 
       return true;
     })
@@ -92,7 +100,20 @@ const allMetaList = (s: ToolStoreState): LobeToolMetaWithAvailability[] => {
   return [...builtinMetas, ...getKlavisMetasWithAvailability(s)];
 };
 
+/**
+ * Get installed builtin tool identifiers
+ */
+const installedBuiltinTools = (s: ToolStoreState): string[] => s.installedBuiltinTools;
+
+/**
+ * Check if a builtin tool is installed
+ */
+const isBuiltinToolInstalled = (identifier: string) => (s: ToolStoreState) =>
+  s.installedBuiltinTools.includes(identifier);
+
 export const builtinToolSelectors = {
   allMetaList,
+  installedBuiltinTools,
+  isBuiltinToolInstalled,
   metaList,
 };

@@ -3,11 +3,13 @@
 import { Avatar, Flexbox, Icon, Text, useModalContext } from '@lobehub/ui';
 import { Button } from 'antd';
 import { cssVar } from 'antd-style';
-import { Loader2, SquareArrowOutUpRight } from 'lucide-react';
+import { Loader2, Plus, SquareArrowOutUpRight } from 'lucide-react';
 import { memo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useSkillConnect } from '@/features/SkillStore/SkillList/LobeHub/useSkillConnect';
+import { useToolStore } from '@/store/tool';
+import { builtinToolSelectors } from '@/store/tool/selectors';
 
 import { useDetailContext } from './DetailContext';
 import { ICON_SIZE, styles } from './styles';
@@ -44,6 +46,17 @@ const Header = memo<HeaderProps>(({ type }) => {
     type: isBuiltin ? 'lobehub' : type, // Use lobehub as fallback for builtin
   });
 
+  // Builtin tool installation state (global, stored in tool store)
+  const [installBuiltinTool, isBuiltinInstalled] = useToolStore((s) => [
+    s.installBuiltinTool,
+    builtinToolSelectors.isBuiltinToolInstalled(identifier)(s),
+  ]);
+
+  const handleBuiltinInstall = async () => {
+    await installBuiltinTool(identifier);
+    close();
+  };
+
   const hasTriggeredConnectRef = useRef(false);
 
   useEffect(() => {
@@ -75,8 +88,19 @@ const Header = memo<HeaderProps>(({ type }) => {
   };
 
   const renderConnectButton = () => {
-    // Builtin tools are always available, no connect button needed
-    if (isBuiltin || isConnected) return null;
+    // Handle builtin tools - only show install button, uninstall is done in settings
+    if (isBuiltin) {
+      if (isBuiltinInstalled) return null;
+
+      return (
+        <Button icon={<Icon icon={Plus} />} onClick={handleBuiltinInstall} type="primary">
+          {t('tools.builtins.install')}
+        </Button>
+      );
+    }
+
+    // Handle Klavis/LobeHub skills
+    if (isConnected) return null;
 
     if (isConnecting) {
       return (

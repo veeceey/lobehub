@@ -17,7 +17,8 @@ interface BuiltinDetailProviderProps {
 export const BuiltinDetailProvider = ({ children, identifier }: BuiltinDetailProviderProps) => {
   const { t } = useTranslation(['setting']);
 
-  const builtinTools = useToolStore(builtinToolSelectors.metaList, isEqual);
+  // Use allMetaList to show details for all builtin tools (including not installed ones)
+  const builtinTools = useToolStore(builtinToolSelectors.allMetaList, isEqual);
 
   const toolMeta = useMemo(
     () => builtinTools.find((tool) => tool.identifier === identifier),
@@ -43,10 +44,10 @@ export const BuiltinDetailProvider = ({ children, identifier }: BuiltinDetailPro
     name: api.name,
   }));
 
-  const localizedDescription = t(`tools.builtin.${identifier}.description`, {
-    defaultValue: meta?.description || '',
+  const localizedTitle = t(`tools.builtins.${identifier}.title`, {
+    defaultValue: meta?.title || identifier,
   });
-  const localizedIntroduction = t(`tools.builtin.${identifier}.introduction`, {
+  const localizedDescription = t(`tools.builtins.${identifier}.description`, {
     defaultValue: meta?.description || '',
   });
 
@@ -59,9 +60,9 @@ export const BuiltinDetailProvider = ({ children, identifier }: BuiltinDetailPro
     identifier,
     introduction: meta?.description || '',
     isConnected: true, // Builtin tools are always "connected"
-    label: meta?.title || identifier,
+    label: localizedTitle,
     localizedDescription,
-    localizedIntroduction,
+    localizedIntroduction: localizedDescription,
     tools,
     toolsLoading: false,
   };

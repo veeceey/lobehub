@@ -4,6 +4,7 @@ import { KLAVIS_SERVER_TYPES, LOBEHUB_SKILL_PROVIDERS } from '@lobechat/const';
 import { type LobeToolMeta } from '@lobechat/types';
 import isEqual from 'fast-deep-equal';
 import { memo, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   createBuiltinSkillDetailModal,
@@ -39,6 +40,7 @@ const getBuiltinToolsOnly = (s: ToolStoreState): LobeToolMeta[] => {
 };
 
 export const LobeHubList = memo<LobeHubListProps>(({ keywords }) => {
+  const { t } = useTranslation('setting');
   const isLobehubSkillEnabled = useServerConfigStore(serverConfigSelectors.enableLobehubSkill);
   const isKlavisEnabled = useServerConfigStore(serverConfigSelectors.enableKlavis);
   const allLobehubSkillServers = useToolStore(lobehubSkillStoreSelectors.getServers, isEqual);
@@ -117,16 +119,22 @@ export const LobeHubList = memo<LobeHubListProps>(({ keywords }) => {
     <div className={gridStyles.grid}>
       {filteredItems.map((item) => {
         if (item.type === 'builtin') {
+          const localizedTitle = t(`tools.builtins.${item.tool.identifier}.title`, {
+            defaultValue: item.tool.meta?.title || item.tool.identifier,
+          });
+          const localizedDescription = t(`tools.builtins.${item.tool.identifier}.description`, {
+            defaultValue: item.tool.meta?.description || '',
+          });
           return (
             <BuiltinItem
               avatar={item.tool.meta?.avatar}
-              description={item.tool.meta?.description}
+              description={localizedDescription}
               identifier={item.tool.identifier}
               key={item.tool.identifier}
               onOpenDetail={() =>
                 createBuiltinSkillDetailModal({ identifier: item.tool.identifier })
               }
-              title={item.tool.meta?.title}
+              title={localizedTitle}
             />
           );
         }
