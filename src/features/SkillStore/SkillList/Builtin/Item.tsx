@@ -2,7 +2,7 @@
 
 import { ActionIcon, Avatar, Block, DropdownMenu, Flexbox, Icon } from '@lobehub/ui';
 import { App } from 'antd';
-import { MoreVerticalIcon, Plus, Unplug } from 'lucide-react';
+import { MoreVerticalIcon, Plus, Trash2 } from 'lucide-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -55,7 +55,7 @@ const Item = memo<ItemProps>(({ avatar, description, identifier, onOpenDetail, t
           items={[
             {
               danger: true,
-              icon: <Icon icon={Unplug} />,
+              icon: <Icon icon={Trash2} />,
               key: 'uninstall',
               label: t('tools.builtins.uninstall'),
               onClick: handleUninstall,
