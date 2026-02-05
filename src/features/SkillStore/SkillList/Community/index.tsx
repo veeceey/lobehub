@@ -10,9 +10,9 @@ import { useToolStore } from '@/store/tool';
 
 import Empty from '../Empty';
 import Loading from '../Loading';
-import WantMoreSkills from '../WantMoreSkills';
 import { virtuosoGridStyles } from '../style';
 import VirtuosoLoading from '../VirtuosoLoading';
+import WantMoreSkills from '../WantMoreSkills';
 import Item from './Item';
 
 export const CommunityList = memo(() => {
@@ -84,9 +84,6 @@ export const CommunityList = memo(() => {
 
     return (
       <VirtuosoGrid
-        components={{
-          Footer: renderFooter,
-        }}
         data={allItems}
         endReached={loadMoreMCPPlugins}
         increaseViewportBy={typeof window !== 'undefined' ? window.innerHeight : 0}
@@ -95,6 +92,9 @@ export const CommunityList = memo(() => {
         listClassName={virtuosoGridStyles.list}
         overscan={24}
         style={{ height: '60vh', width: '100%' }}
+        components={{
+          Footer: renderFooter,
+        }}
       />
     );
   };

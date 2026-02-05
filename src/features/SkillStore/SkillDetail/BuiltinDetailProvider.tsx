@@ -1,13 +1,15 @@
 'use client';
 
 import isEqual from 'fast-deep-equal';
-import { type ReactNode, useMemo } from 'react';
+import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useToolStore } from '@/store/tool';
 import { builtinToolSelectors } from '@/store/tool/selectors';
 
-import { DetailContext, type DetailContextValue } from './DetailContext';
+import type { DetailContextValue } from './DetailContext';
+import { DetailContext } from './DetailContext';
 
 interface BuiltinDetailProviderProps {
   children: ReactNode;
@@ -67,5 +69,5 @@ export const BuiltinDetailProvider = ({ children, identifier }: BuiltinDetailPro
     toolsLoading: false,
   };
 
-  return <DetailContext.Provider value={value}>{children}</DetailContext.Provider>;
+  return <DetailContext value={value}>{children}</DetailContext>;
 };

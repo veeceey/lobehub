@@ -61,6 +61,7 @@ const BuiltinSkillItem = memo<BuiltinSkillItemProps>(({ identifier, title, avata
     if (isInstalled) {
       return (
         <DropdownMenu
+          placement="bottomRight"
           items={[
             {
               danger: true,
@@ -70,7 +71,6 @@ const BuiltinSkillItem = memo<BuiltinSkillItemProps>(({ identifier, title, avata
               onClick: handleUninstall,
             },
           ]}
-          placement="bottomRight"
         >
           <Button icon={MoreHorizontalIcon} />
         </DropdownMenu>
@@ -86,19 +86,19 @@ const BuiltinSkillItem = memo<BuiltinSkillItemProps>(({ identifier, title, avata
 
   return (
     <Flexbox
+      horizontal
       align="center"
       className={styles.container}
       gap={16}
-      horizontal
       justify="space-between"
     >
-      <Flexbox align="center" gap={16} horizontal style={{ flex: 1, overflow: 'hidden' }}>
+      <Flexbox horizontal align="center" gap={16} style={{ flex: 1, overflow: 'hidden' }}>
         <Flexbox
+          horizontal
           align="center"
           gap={16}
-          horizontal
-          onClick={() => createBuiltinSkillDetailModal({ identifier })}
           style={{ cursor: 'pointer' }}
+          onClick={() => createBuiltinSkillDetailModal({ identifier })}
         >
           <div className={`${styles.icon} ${!isInstalled ? styles.disconnectedIcon : ''}`}>
             <Avatar avatar={avatar} size={32} />
@@ -111,7 +111,7 @@ const BuiltinSkillItem = memo<BuiltinSkillItemProps>(({ identifier, title, avata
           </Flexbox>
         </Flexbox>
       </Flexbox>
-      <Flexbox align="center" gap={12} horizontal onClick={(e) => e.stopPropagation()}>
+      <Flexbox horizontal align="center" gap={12} onClick={(e) => e.stopPropagation()}>
         {isInstalled && renderStatus()}
         {renderActions()}
       </Flexbox>

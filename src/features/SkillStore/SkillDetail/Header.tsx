@@ -17,7 +17,7 @@ import { ICON_SIZE, styles } from './styles';
 // Check if a string is likely an emoji or short text (not a URL or icon component)
 const isEmojiOrText = (str: string): boolean => {
   // If it starts with http/https or contains common image extensions, it's a URL
-  if (/^https?:\/\//.test(str) || /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(str)) {
+  if (/^https?:\/\//.test(str) || /\.(?:png|jpg|jpeg|gif|svg|webp)$/i.test(str)) {
     return false;
   }
   // Short strings (<=4 chars) are likely emojis or short text
@@ -93,7 +93,7 @@ const Header = memo<HeaderProps>(({ type }) => {
       if (isBuiltinInstalled) return null;
 
       return (
-        <Button icon={<Icon icon={Plus} />} onClick={handleBuiltinInstall} type="primary">
+        <Button icon={<Icon icon={Plus} />} type="primary" onClick={handleBuiltinInstall}>
           {t('tools.builtins.install')}
         </Button>
       );

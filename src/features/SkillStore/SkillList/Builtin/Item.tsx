@@ -52,6 +52,8 @@ const Item = memo<ItemProps>(({ avatar, description, identifier, onOpenDetail, t
     if (isInstalled) {
       return (
         <DropdownMenu
+          nativeButton={false}
+          placement="bottomRight"
           items={[
             {
               danger: true,
@@ -61,28 +63,26 @@ const Item = memo<ItemProps>(({ avatar, description, identifier, onOpenDetail, t
               onClick: handleUninstall,
             },
           ]}
-          nativeButton={false}
-          placement="bottomRight"
         >
           <ActionIcon icon={MoreVerticalIcon} />
         </DropdownMenu>
       );
     }
 
-    return <ActionIcon icon={Plus} onClick={handleInstall} title={t('tools.builtins.install')} />;
+    return <ActionIcon icon={Plus} title={t('tools.builtins.install')} onClick={handleInstall} />;
   };
 
   return (
     <Block
+      horizontal
       align={'center'}
       className={styles.container}
       gap={12}
-      horizontal
-      onClick={onOpenDetail}
       paddingBlock={12}
       paddingInline={12}
       style={{ cursor: 'pointer' }}
       variant={'outlined'}
+      onClick={onOpenDetail}
     >
       <Avatar avatar={avatar} size={40} style={{ marginInlineEnd: 0 }} />
       <Flexbox flex={1} gap={4} style={{ minWidth: 0, overflow: 'hidden' }}>

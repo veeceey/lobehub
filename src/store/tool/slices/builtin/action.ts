@@ -1,12 +1,13 @@
 import debug from 'debug';
-import useSWR, { type SWRResponse } from 'swr';
+import type { SWRResponse } from 'swr';
+import useSWR from 'swr';
 
-import type {StoreSetter} from '@/store/types';
 import { mutate } from '@/libs/swr';
-import { userService } from '@/services/user'
+import { userService } from '@/services/user';
+import type { StoreSetter } from '@/store/types';
 import { setNamespace } from '@/utils/storeDebug';
 
-import type {ToolStore} from '../../store';
+import type { ToolStore } from '../../store';
 import { invokeExecutor } from './executors/index';
 import type { BuiltinToolContext, BuiltinToolResult } from './types';
 

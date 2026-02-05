@@ -1,15 +1,15 @@
 'use client';
 
-import type {KlavisServerType, LobehubSkillProviderType} from '@lobechat/const';
+import type { KlavisServerType, LobehubSkillProviderType } from '@lobechat/const';
 import {
   getKlavisServerByServerIdentifier,
   getLobehubSkillProviderById,
   KLAVIS_SERVER_TYPES,
   LOBEHUB_SKILL_PROVIDERS,
   RECOMMENDED_SKILLS,
-  RecommendedSkillType
+  RecommendedSkillType,
 } from '@lobechat/const';
-import { type LobeBuiltinTool } from '@lobechat/types';
+import type { LobeBuiltinTool } from '@lobechat/types';
 import { Center, Empty } from '@lobehub/ui';
 import { Divider } from 'antd';
 import { createStaticStyles } from 'antd-style';
@@ -30,7 +30,7 @@ import {
 } from '@/store/tool/selectors';
 import { KlavisServerStatus } from '@/store/tool/slices/klavisStore';
 import { LobehubSkillStatus } from '@/store/tool/slices/lobehubSkillStore/types';
-import type {LobeToolType} from '@/types/tool/tool';
+import type { LobeToolType } from '@/types/tool/tool';
 
 import BuiltinSkillItem from './BuiltinSkillItem';
 import KlavisSkillItem from './KlavisSkillItem';

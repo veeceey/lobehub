@@ -1,7 +1,7 @@
 'use client';
 
 import { KLAVIS_SERVER_TYPES, LOBEHUB_SKILL_PROVIDERS } from '@lobechat/const';
-import { type LobeToolMeta } from '@lobechat/types';
+import type { LobeToolMeta } from '@lobechat/types';
 import isEqual from 'fast-deep-equal';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,15 +13,15 @@ import {
 } from '@/features/SkillStore/SkillDetail';
 import { serverConfigSelectors, useServerConfigStore } from '@/store/serverConfig';
 import { useToolStore } from '@/store/tool';
-import { type ToolStoreState } from '@/store/tool/initialState';
+import type { ToolStoreState } from '@/store/tool/initialState';
 import { klavisStoreSelectors, lobehubSkillStoreSelectors } from '@/store/tool/selectors';
 import { KlavisServerStatus } from '@/store/tool/slices/klavisStore';
 import { LobehubSkillStatus } from '@/store/tool/slices/lobehubSkillStore/types';
 
 import BuiltinItem from '../Builtin/Item';
 import Empty from '../Empty';
-import WantMoreSkills from '../WantMoreSkills';
 import { gridStyles } from '../style';
+import WantMoreSkills from '../WantMoreSkills';
 import Item from './Item';
 
 interface LobeHubListProps {
@@ -133,10 +133,10 @@ export const LobeHubList = memo<LobeHubListProps>(({ keywords }) => {
                 description={localizedDescription}
                 identifier={item.tool.identifier}
                 key={item.tool.identifier}
+                title={localizedTitle}
                 onOpenDetail={() =>
                   createBuiltinSkillDetailModal({ identifier: item.tool.identifier })
                 }
-                title={localizedTitle}
               />
             );
           }
@@ -151,8 +151,8 @@ export const LobeHubList = memo<LobeHubListProps>(({ keywords }) => {
                 isConnected={isConnected}
                 key={item.provider.id}
                 label={item.provider.label}
-                onOpenDetail={() => createLobehubSkillDetailModal({ identifier: item.provider.id })}
                 type="lobehub"
+                onOpenDetail={() => createLobehubSkillDetailModal({ identifier: item.provider.id })}
               />
             );
           }
@@ -166,14 +166,14 @@ export const LobeHubList = memo<LobeHubListProps>(({ keywords }) => {
               isConnected={isConnected}
               key={item.serverType.identifier}
               label={item.serverType.label}
+              serverName={item.serverType.serverName}
+              type="klavis"
               onOpenDetail={() =>
                 createKlavisSkillDetailModal({
                   identifier: item.serverType.identifier,
                   serverName: item.serverType.serverName,
                 })
               }
-              serverName={item.serverType.serverName}
-              type="klavis"
             />
           );
         })}
