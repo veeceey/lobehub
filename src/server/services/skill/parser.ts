@@ -1,0 +1,186 @@
+import {
+  type ParsedSkill,
+  type ParsedZipSkill,
+  type SkillManifest,
+  skillManifestSchema,
+} from '@lobechat/types';
+import { unzip as fflateUnzip } from 'fflate';
+import matter from 'gray-matter';
+import { sha256 } from 'js-sha256';
+import { readFile } from 'node:fs/promises';
+
+import { SkillManifestError, SkillParseError } from './errors';
+
+export class SkillParser {
+  /**
+   * Parse SKILL.md file content
+   * @param fileContent - Raw content of SKILL.md file
+   * @returns Parsed manifest, content and raw content
+   */
+  parseSkillMd(fileContent: string): ParsedSkill {
+    try {
+      const { data, content } = matter(fileContent);
+      const manifest = this.validateManifest(data);
+
+      return {
+        content: content.trim(),
+        manifest,
+        raw: fileContent,
+      };
+    } catch (error) {
+      if (error instanceof SkillManifestError) throw error;
+      throw new SkillParseError('Failed to parse SKILL.md', error as Error);
+    }
+  }
+
+  /**
+   * Parse ZIP file from path
+   * @param filePath - Path to ZIP file
+   * @returns Parsed manifest, content, resource file mapping and ZIP hash
+   */
+  async parseZipFile(filePath: string): Promise<ParsedZipSkill> {
+    try {
+      const buffer = await readFile(filePath);
+      return this.parseZipPackage(buffer);
+    } catch (error) {
+      if (error instanceof SkillParseError || error instanceof SkillManifestError) {
+        throw error;
+      }
+      throw new SkillParseError(`Failed to read ZIP file: ${filePath}`, error as Error);
+    }
+  }
+
+  /**
+   * Parse ZIP package
+   * @param buffer - ZIP file Buffer
+   * @returns Parsed manifest, content, resource file mapping and ZIP hash
+   */
+  async parseZipPackage(buffer: Buffer): Promise<ParsedZipSkill> {
+    try {
+      const unzipped = await this.unzipBuffer(buffer);
+
+      // Find SKILL.md (support root directory or first-level subdirectory)
+      const { skillMdContent, skillMdPath } = this.findSkillMd(unzipped);
+      if (!skillMdPath) {
+        throw new SkillParseError('SKILL.md not found in zip package');
+      }
+
+      // Parse SKILL.md
+      const { content, manifest } = this.parseSkillMd(skillMdContent);
+
+      // Extract resource files
+      const resources = this.extractResources(unzipped, skillMdPath);
+
+      // Calculate ZIP hash
+      const zipHash = sha256(buffer);
+
+      return { content, manifest, resources, zipHash };
+    } catch (error) {
+      if (error instanceof SkillParseError || error instanceof SkillManifestError) {
+        throw error;
+      }
+      throw new SkillParseError('Failed to parse ZIP package', error as Error);
+    }
+  }
+
+  /**
+   * Validate manifest data
+   */
+  validateManifest(data: unknown): SkillManifest {
+    const result = skillManifestSchema.safeParse(data);
+    if (!result.success) {
+      throw new SkillManifestError(
+        'Invalid skill manifest: ' + result.error.issues.map((i) => i.message).join(', '),
+        result.error,
+      );
+    }
+    return result.data;
+  }
+
+  /**
+   * Unzip Buffer using fflate
+   */
+  private unzipBuffer(buffer: Buffer): Promise<Record<string, Uint8Array>> {
+    return new Promise((resolve, reject) => {
+      fflateUnzip(new Uint8Array(buffer), (error, unzipped) => {
+        if (error) reject(new SkillParseError('Failed to unzip buffer', error));
+        else resolve(unzipped);
+      });
+    });
+  }
+
+  /**
+   * Find SKILL.md file
+   * Supports:
+   * - Root directory: SKILL.md
+   * - First-level subdirectory: skill-name/SKILL.md
+   */
+  private findSkillMd(unzipped: Record<string, Uint8Array>): {
+    skillMdContent: string;
+    skillMdPath: string | null;
+  } {
+    const decoder = new TextDecoder();
+
+    // Check root directory first
+    if (unzipped['SKILL.md']) {
+      return {
+        skillMdContent: decoder.decode(unzipped['SKILL.md']),
+        skillMdPath: 'SKILL.md',
+      };
+    }
+
+    // Check first-level subdirectory
+    const skillMdPattern = /^[^/]+\/SKILL\.md$/;
+    const match = Object.keys(unzipped).find((path) => skillMdPattern.test(path));
+
+    if (match) {
+      return {
+        skillMdContent: decoder.decode(unzipped[match]),
+        skillMdPath: match,
+      };
+    }
+
+    return { skillMdContent: '', skillMdPath: null };
+  }
+
+  /**
+   * Extract resource files
+   * Excludes SKILL.md itself, directories, hidden files and __MACOSX
+   */
+  private extractResources(
+    unzipped: Record<string, Uint8Array>,
+    skillMdPath: string,
+  ): Map<string, Buffer> {
+    const resources = new Map<string, Buffer>();
+
+    // Determine base path (if SKILL.md is in subdirectory)
+    const basePath = skillMdPath.includes('/')
+      ? skillMdPath.slice(0, skillMdPath.lastIndexOf('/') + 1)
+      : '';
+
+    for (const [path, data] of Object.entries(unzipped)) {
+      // Skip directories, hidden files, __MACOSX and SKILL.md
+      if (
+        path.endsWith('/') ||
+        path.startsWith('.') ||
+        path.includes('__MACOSX') ||
+        path === skillMdPath
+      ) {
+        continue;
+      }
+
+      // Skip files outside base path
+      if (basePath && !path.startsWith(basePath)) continue;
+
+      // Calculate relative path
+      const relativePath = basePath ? path.slice(basePath.length) : path;
+
+      // Skip empty paths
+      if (!relativePath) continue;
+
+      resources.set(relativePath, Buffer.from(data));
+    }
+
+    return resources;
+  }
+}
