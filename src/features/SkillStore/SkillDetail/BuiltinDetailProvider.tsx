@@ -52,6 +52,9 @@ export const BuiltinDetailProvider = ({ children, identifier }: BuiltinDetailPro
   const localizedDescription = t(`tools.builtins.${identifier}.description`, {
     defaultValue: meta?.description || '',
   });
+  const localizedReadme = t(`tools.builtins.${identifier}.readme`, {
+    defaultValue: manifest.meta.readme || '',
+  });
 
   const value: DetailContextValue = {
     author: 'LobeHub',
@@ -60,11 +63,11 @@ export const BuiltinDetailProvider = ({ children, identifier }: BuiltinDetailPro
     description: meta?.description || '',
     icon: meta?.avatar || '',
     identifier,
-    introduction: meta?.description || '',
     isConnected: true, // Builtin tools are always "connected"
     label: localizedTitle,
     localizedDescription,
-    localizedIntroduction: localizedDescription,
+    localizedReadme,
+    readme: manifest.meta.readme || '',
     tools,
     toolsLoading: false,
   };
