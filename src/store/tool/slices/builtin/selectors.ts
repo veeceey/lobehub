@@ -88,14 +88,28 @@ const EXCLUDED_TOOLS = new Set([
  * Returns availability info so UI can show hints for unavailable tools
  */
 const allMetaList = (s: ToolStoreState): LobeToolMetaWithAvailability[] => {
-  const { uninstalledBuiltinTools } = s;
-
   const builtinMetas = s.builtinTools
     .filter((item) => {
       // Exclude internal tools that should not be user-configurable
       if (EXCLUDED_TOOLS.has(item.identifier)) return false;
 
-      // Exclude uninstalled tools
+      return true;
+    })
+    .map(toBuiltinMetaWithAvailability);
+
+  return [...builtinMetas, ...getKlavisMetasWithAvailability(s)];
+};
+
+/**
+ * Get installed builtin tools meta list (excludes uninstalled, includes hidden and platform-specific)
+ * Used for agent profile tool configuration where only installed tools should be shown
+ */
+const installedAllMetaList = (s: ToolStoreState): LobeToolMetaWithAvailability[] => {
+  const { uninstalledBuiltinTools } = s;
+
+  const builtinMetas = s.builtinTools
+    .filter((item) => {
+      if (EXCLUDED_TOOLS.has(item.identifier)) return false;
       if (uninstalledBuiltinTools.includes(item.identifier)) return false;
 
       return true;
@@ -118,6 +132,7 @@ const isBuiltinToolInstalled = (identifier: string) => (s: ToolStoreState) =>
 
 export const builtinToolSelectors = {
   allMetaList,
+  installedAllMetaList,
   isBuiltinToolInstalled,
   metaList,
   uninstalledBuiltinTools,
