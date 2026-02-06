@@ -20,7 +20,7 @@ interface ItemProps {
 }
 
 const Item = memo<ItemProps>(({ avatar, description, identifier, onOpenDetail, title }) => {
-  const { t } = useTranslation('setting');
+  const { t } = useTranslation(['setting', 'plugin']);
   const styles = itemStyles;
   const { modal } = App.useApp();
 
@@ -36,15 +36,13 @@ const Item = memo<ItemProps>(({ avatar, description, identifier, onOpenDetail, t
 
   const handleUninstall = () => {
     modal.confirm({
-      cancelText: t('cancel', { ns: 'common' }),
       centered: true,
-      content: t('tools.builtins.uninstallConfirm.desc', { name: title || identifier }),
       okButtonProps: { danger: true },
-      okText: t('tools.builtins.uninstall'),
       onOk: async () => {
         await uninstallBuiltinTool(identifier);
       },
-      title: t('tools.builtins.uninstallConfirm.title', { name: title || identifier }),
+      title: t('store.actions.confirmUninstall', { ns: 'plugin' }),
+      type: 'error',
     });
   };
 
@@ -59,7 +57,7 @@ const Item = memo<ItemProps>(({ avatar, description, identifier, onOpenDetail, t
               danger: true,
               icon: <Icon icon={Trash2} />,
               key: 'uninstall',
-              label: t('tools.builtins.uninstall'),
+              label: t('store.actions.uninstall', { ns: 'plugin' }),
               onClick: handleUninstall,
             },
           ]}
