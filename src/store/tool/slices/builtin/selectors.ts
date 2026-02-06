@@ -88,10 +88,15 @@ const EXCLUDED_TOOLS = new Set([
  * Returns availability info so UI can show hints for unavailable tools
  */
 const allMetaList = (s: ToolStoreState): LobeToolMetaWithAvailability[] => {
+  const { uninstalledBuiltinTools } = s;
+
   const builtinMetas = s.builtinTools
     .filter((item) => {
       // Exclude internal tools that should not be user-configurable
       if (EXCLUDED_TOOLS.has(item.identifier)) return false;
+
+      // Exclude uninstalled tools
+      if (uninstalledBuiltinTools.includes(item.identifier)) return false;
 
       return true;
     })
