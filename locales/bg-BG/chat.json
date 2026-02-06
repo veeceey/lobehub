@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "Прегледай подробности",
   "clearCurrentMessages": "Изчисти съобщенията от текущата сесия",
   "compressedHistory": "Сгъната история",
+  "compression.cancel": "Разархивирай",
+  "compression.cancelConfirm": "Сигурни ли сте, че искате да разархивирате? Това ще възстанови оригиналните съобщения.",
   "compression.history": "История",
   "compression.summary": "Резюме",
   "confirmClearCurrentMessages": "Ще изчистите съобщенията от текущата сесия. След изчистване те не могат да бъдат възстановени. Моля, потвърдете действието си.",

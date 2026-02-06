@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "Details bekijken",
   "clearCurrentMessages": "Huidige sessieberichten wissen",
   "compressedHistory": "Samengevatte Geschiedenis",
+  "compression.cancel": "Decomprimeren",
+  "compression.cancelConfirm": "Weet je zeker dat je wilt decomprimeren? Dit herstelt de oorspronkelijke berichten.",
   "compression.history": "Geschiedenis",
   "compression.summary": "Samenvatting",
   "confirmClearCurrentMessages": "Je staat op het punt de huidige sessieberichten te wissen. Na het wissen kunnen ze niet worden hersteld. Bevestig je actie.",

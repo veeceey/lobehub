@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "Ver detalhes",
   "clearCurrentMessages": "Limpar mensagens da sessão atual",
   "compressedHistory": "Histórico Comprimido",
+  "compression.cancel": "Descompactar",
+  "compression.cancelConfirm": "Tem certeza de que deseja descompactar? Isso restaurará as mensagens originais.",
   "compression.history": "Histórico",
   "compression.summary": "Resumo",
   "confirmClearCurrentMessages": "Você está prestes a limpar as mensagens da sessão atual. Uma vez limpas, não poderão ser recuperadas. Confirme sua ação.",

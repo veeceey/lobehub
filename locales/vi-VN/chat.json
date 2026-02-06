@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "Xem chi tiết",
   "clearCurrentMessages": "Xóa tin nhắn phiên hiện tại",
   "compressedHistory": "Lịch sử đã nén",
+  "compression.cancel": "Bỏ nén",
+  "compression.cancelConfirm": "Bạn có chắc chắn muốn bỏ nén không? Thao tác này sẽ khôi phục lại các tin nhắn gốc.",
   "compression.history": "Lịch sử",
   "compression.summary": "Tóm tắt",
   "confirmClearCurrentMessages": "Bạn sắp xóa tất cả tin nhắn trong phiên hiện tại. Sau khi xóa sẽ không thể khôi phục. Vui lòng xác nhận hành động.",

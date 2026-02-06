@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "Details anzeigen",
   "clearCurrentMessages": "Aktuelle Sitzung löschen",
   "compressedHistory": "Komprimierte Historie",
+  "compression.cancel": "Dekomprimieren",
+  "compression.cancelConfirm": "Möchten Sie die Dekomprimierung wirklich durchführen? Dadurch werden die ursprünglichen Nachrichten wiederhergestellt.",
   "compression.history": "Verlauf",
   "compression.summary": "Zusammenfassung",
   "confirmClearCurrentMessages": "Sie sind dabei, die aktuellen Sitzungsnachrichten zu löschen. Nach dem Löschen können sie nicht wiederhergestellt werden. Bitte bestätigen Sie Ihre Aktion.",

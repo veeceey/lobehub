@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "자세히 보기",
   "clearCurrentMessages": "현재 대화 메시지 지우기",
   "compressedHistory": "압축된 기록",
+  "compression.cancel": "압축 해제",
+  "compression.cancelConfirm": "정말로 압축을 해제하시겠습니까? 원래 메시지가 복원됩니다.",
   "compression.history": "기록",
   "compression.summary": "요약",
   "confirmClearCurrentMessages": "현재 대화 메시지를 지우시겠습니까? 지운 후 복구할 수 없습니다",

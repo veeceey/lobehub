@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "Ayrıntıları Görüntüle",
   "clearCurrentMessages": "Geçerli oturum mesajlarını temizle",
   "compressedHistory": "Sıkıştırılmış Geçmiş",
+  "compression.cancel": "Sıkıştırmayı Geri Al",
+  "compression.cancelConfirm": "Sıkıştırmayı geri almak istediğinizden emin misiniz? Bu işlem, orijinal mesajları geri yükleyecektir.",
   "compression.history": "Geçmiş",
   "compression.summary": "Özet",
   "confirmClearCurrentMessages": "Geçerli oturum mesajlarını temizlemek üzeresiniz. Temizlendikten sonra geri alınamaz. Lütfen işleminizi onaylayın.",

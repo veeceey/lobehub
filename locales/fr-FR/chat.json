@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "Voir les détails",
   "clearCurrentMessages": "Effacer les messages de la session actuelle",
   "compressedHistory": "Historique compressé",
+  "compression.cancel": "Décompresser",
+  "compression.cancelConfirm": "Êtes-vous sûr de vouloir décompresser ? Cela restaurera les messages d'origine.",
   "compression.history": "Historique",
   "compression.summary": "Résumé",
   "confirmClearCurrentMessages": "Vous êtes sur le point d’effacer les messages de la session actuelle. Une fois effacés, ils ne pourront pas être récupérés. Veuillez confirmer votre action.",

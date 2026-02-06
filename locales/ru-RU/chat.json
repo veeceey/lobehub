@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "Просмотреть детали",
   "clearCurrentMessages": "Очистить текущие сообщения",
   "compressedHistory": "Сжатая история",
+  "compression.cancel": "Распаковать",
+  "compression.cancelConfirm": "Вы уверены, что хотите распаковать? Это восстановит исходные сообщения.",
   "compression.history": "История",
   "compression.summary": "Сводка",
   "confirmClearCurrentMessages": "Вы собираетесь очистить текущие сообщения. После удаления их нельзя будет восстановить. Подтвердите действие.",

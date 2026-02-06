@@ -32,6 +32,8 @@
   "chatList.longMessageDetail": "詳細を見る",
   "clearCurrentMessages": "現在の会話メッセージをクリア",
   "compressedHistory": "圧縮された履歴",
+  "compression.cancel": "解凍する",
+  "compression.cancelConfirm": "本当に解凍しますか？元のメッセージが復元されます。",
   "compression.history": "履歴",
   "compression.summary": "要約",
   "confirmClearCurrentMessages": "現在の会話メッセージをクリアしてもよろしいですか？クリア後は復元できません",
