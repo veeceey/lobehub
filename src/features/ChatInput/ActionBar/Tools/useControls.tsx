@@ -4,8 +4,8 @@ import {
   RECOMMENDED_SKILLS,
   RecommendedSkillType,
 } from '@lobechat/const';
-import type {ItemType} from '@lobehub/ui';
-import { Avatar, Icon  } from '@lobehub/ui';
+import type { ItemType } from '@lobehub/ui';
+import { Avatar, Icon } from '@lobehub/ui';
 import isEqual from 'fast-deep-equal';
 import { ToyBrick } from 'lucide-react';
 import { useMemo } from 'react';
@@ -57,17 +57,17 @@ export const useControls = ({ setUpdating }: { setUpdating: (updating: boolean) 
     useFetchPluginStore,
     useFetchUserKlavisServers,
     useFetchLobehubSkillConnections,
-    useFetchInstalledBuiltinTools,
+    useFetchUninstalledBuiltinTools,
   ] = useToolStore((s) => [
     s.useFetchPluginStore,
     s.useFetchUserKlavisServers,
     s.useFetchLobehubSkillConnections,
-    s.useFetchInstalledBuiltinTools,
+    s.useFetchUninstalledBuiltinTools,
   ]);
 
   useFetchPluginStore();
   useFetchInstalledPlugins();
-  useFetchInstalledBuiltinTools(true);
+  useFetchUninstalledBuiltinTools(true);
   useCheckPluginsIsInstalled(plugins);
 
   // 使用 SWR 加载用户的 Klavis 集成（从数据库）

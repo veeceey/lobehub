@@ -63,22 +63,25 @@ const SkillList = memo(() => {
   const allKlavisServers = useToolStore(klavisStoreSelectors.getServers, isEqual);
   const installedPluginList = useToolStore(pluginSelectors.installedPluginMetaList, isEqual);
   const allBuiltinTools = useToolStore((s) => s.builtinTools, isEqual);
-  const installedBuiltinTools = useToolStore(builtinToolSelectors.installedBuiltinTools, isEqual);
+  const uninstalledBuiltinTools = useToolStore(
+    builtinToolSelectors.uninstalledBuiltinTools,
+    isEqual,
+  );
 
   const [
     useFetchLobehubSkillConnections,
     useFetchUserKlavisServers,
-    useFetchInstalledBuiltinTools,
+    useFetchUninstalledBuiltinTools,
   ] = useToolStore((s) => [
     s.useFetchLobehubSkillConnections,
     s.useFetchUserKlavisServers,
-    s.useFetchInstalledBuiltinTools,
+    s.useFetchUninstalledBuiltinTools,
   ]);
 
   useFetchInstalledPlugins();
   useFetchLobehubSkillConnections(isLobehubSkillEnabled);
   useFetchUserKlavisServers(isKlavisEnabled);
-  useFetchInstalledBuiltinTools(true);
+  useFetchUninstalledBuiltinTools(true);
 
   const getLobehubSkillServerByProvider = (providerId: string) => {
     return allLobehubSkillServers.find((server) => server.identifier === providerId);
@@ -93,7 +96,7 @@ const SkillList = memo(() => {
   };
 
   const isBuiltinToolInstalled = (identifier: string) => {
-    return installedBuiltinTools.includes(identifier);
+    return !uninstalledBuiltinTools.includes(identifier);
   };
 
   // Separate skills into three categories:
@@ -249,7 +252,7 @@ const SkillList = memo(() => {
     allLobehubSkillServers,
     allKlavisServers,
     allBuiltinTools,
-    installedBuiltinTools,
+    uninstalledBuiltinTools,
   ]);
 
   const hasAnySkills = integrations.length > 0 || communityMCPs.length > 0 || customMCPs.length > 0;

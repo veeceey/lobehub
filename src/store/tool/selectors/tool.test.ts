@@ -1,8 +1,8 @@
-import type { LobeChatPluginManifest} from '@lobehub/chat-plugin-sdk';
+import type { LobeChatPluginManifest } from '@lobehub/chat-plugin-sdk';
 import { describe, expect, it } from 'vitest';
 
-import type { ToolStoreState  } from '../initialState';
-import { initialState  } from '../initialState';
+import type { ToolStoreState } from '../initialState';
+import { initialState } from '../initialState';
 import { toolSelectors } from './tool';
 
 const mockState = {
@@ -63,7 +63,7 @@ const mockState = {
     'plugin-1': false,
     'plugin-2': true,
   },
-  installedBuiltinTools: ['builtin-1'],
+  uninstalledBuiltinTools: [],
 } as ToolStoreState;
 
 describe('toolSelectors', () => {

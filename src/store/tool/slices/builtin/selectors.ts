@@ -1,4 +1,4 @@
-import type {LobeToolMeta} from '@lobechat/types';
+import type { LobeToolMeta } from '@lobechat/types';
 
 import { shouldEnableTool } from '@/helpers/toolFilters';
 
@@ -50,10 +50,10 @@ const getKlavisMetasWithAvailability = (s: ToolStoreState): LobeToolMetaWithAvai
 /**
  * Get visible builtin tools meta list (excludes hidden tools)
  * Used for general tool display in chat input bar
- * Only returns tools that are installed (in installedBuiltinTools list)
+ * Only returns tools that are not in the uninstalledBuiltinTools list
  */
 const metaList = (s: ToolStoreState): LobeToolMeta[] => {
-  const { installedBuiltinTools } = s;
+  const { uninstalledBuiltinTools } = s;
 
   const builtinMetas = s.builtinTools
     .filter((item) => {
@@ -63,8 +63,8 @@ const metaList = (s: ToolStoreState): LobeToolMeta[] => {
       // Filter platform-specific tools (e.g., LocalSystem desktop-only)
       if (!shouldEnableTool(item.identifier)) return false;
 
-      // Only include installed tools
-      if (!installedBuiltinTools.includes(item.identifier)) {
+      // Exclude uninstalled tools
+      if (uninstalledBuiltinTools.includes(item.identifier)) {
         return false;
       }
 
@@ -101,19 +101,19 @@ const allMetaList = (s: ToolStoreState): LobeToolMetaWithAvailability[] => {
 };
 
 /**
- * Get installed builtin tool identifiers
+ * Get uninstalled builtin tool identifiers
  */
-const installedBuiltinTools = (s: ToolStoreState): string[] => s.installedBuiltinTools;
+const uninstalledBuiltinTools = (s: ToolStoreState): string[] => s.uninstalledBuiltinTools;
 
 /**
  * Check if a builtin tool is installed
  */
 const isBuiltinToolInstalled = (identifier: string) => (s: ToolStoreState) =>
-  s.installedBuiltinTools.includes(identifier);
+  !s.uninstalledBuiltinTools.includes(identifier);
 
 export const builtinToolSelectors = {
   allMetaList,
-  installedBuiltinTools,
   isBuiltinToolInstalled,
   metaList,
+  uninstalledBuiltinTools,
 };

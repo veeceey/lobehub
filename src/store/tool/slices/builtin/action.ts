@@ -14,7 +14,7 @@ import type { BuiltinToolContext, BuiltinToolResult } from './types';
 const n = setNamespace('builtinTool');
 const log = debug('lobe-store:builtin-tool');
 
-const INSTALLED_BUILTIN_TOOLS = 'loadInstalledBuiltinTools';
+const UNINSTALLED_BUILTIN_TOOLS = 'loadUninstalledBuiltinTools';
 
 /**
  * Builtin Tool Action Interface
@@ -97,76 +97,76 @@ export class BuiltinToolActionImpl {
     }
   };
 
-  // ========== Installed Builtin Tools Management ==========
+  // ========== Uninstalled Builtin Tools Management ==========
 
   /**
-   * Install a builtin tool by adding it to the installed list
+   * Install a builtin tool by removing it from the uninstalled list
    */
   installBuiltinTool = async (identifier: string): Promise<void> => {
-    const currentInstalled = this.#get().installedBuiltinTools;
+    const currentUninstalled = this.#get().uninstalledBuiltinTools;
 
-    if (currentInstalled.includes(identifier)) return;
+    if (!currentUninstalled.includes(identifier)) return;
 
-    const newInstalled = [...currentInstalled, identifier];
+    const newUninstalled = currentUninstalled.filter((id) => id !== identifier);
 
     // Optimistic update
-    this.#set({ installedBuiltinTools: newInstalled }, false, n('installBuiltinTool'));
+    this.#set({ uninstalledBuiltinTools: newUninstalled }, false, n('installBuiltinTool'));
 
     // Persist to user settings
     await userService.updateUserSettings({
-      tool: { installedBuiltinTools: newInstalled },
+      tool: { uninstalledBuiltinTools: newUninstalled },
     });
 
     // Refresh to ensure consistency
-    await this.refreshInstalledBuiltinTools();
+    await this.refreshUninstalledBuiltinTools();
   };
 
   /**
-   * Uninstall a builtin tool by removing it from the installed list
+   * Uninstall a builtin tool by adding it to the uninstalled list
    */
   uninstallBuiltinTool = async (identifier: string): Promise<void> => {
-    const currentInstalled = this.#get().installedBuiltinTools;
+    const currentUninstalled = this.#get().uninstalledBuiltinTools;
 
-    if (!currentInstalled.includes(identifier)) return;
+    if (currentUninstalled.includes(identifier)) return;
 
-    const newInstalled = currentInstalled.filter((id) => id !== identifier);
+    const newUninstalled = [...currentUninstalled, identifier];
 
     // Optimistic update
-    this.#set({ installedBuiltinTools: newInstalled }, false, n('uninstallBuiltinTool'));
+    this.#set({ uninstalledBuiltinTools: newUninstalled }, false, n('uninstallBuiltinTool'));
 
     // Persist to user settings
     await userService.updateUserSettings({
-      tool: { installedBuiltinTools: newInstalled },
+      tool: { uninstalledBuiltinTools: newUninstalled },
     });
 
     // Refresh to ensure consistency
-    await this.refreshInstalledBuiltinTools();
+    await this.refreshUninstalledBuiltinTools();
   };
 
   /**
-   * Refresh installed builtin tools from server
+   * Refresh uninstalled builtin tools from server
    */
-  refreshInstalledBuiltinTools = async (): Promise<void> => {
-    await mutate(INSTALLED_BUILTIN_TOOLS);
+  refreshUninstalledBuiltinTools = async (): Promise<void> => {
+    await mutate(UNINSTALLED_BUILTIN_TOOLS);
   };
 
   /**
-   * SWR hook to fetch installed builtin tools
+   * SWR hook to fetch uninstalled builtin tools
    */
-  useFetchInstalledBuiltinTools = (enabled: boolean): SWRResponse<string[]> => {
+  useFetchUninstalledBuiltinTools = (enabled: boolean): SWRResponse<string[]> => {
     return useSWR<string[]>(
-      enabled ? INSTALLED_BUILTIN_TOOLS : null,
+      enabled ? UNINSTALLED_BUILTIN_TOOLS : null,
       async () => {
         const userState = await userService.getUserState();
-        return userState?.settings?.tool?.installedBuiltinTools || [];
+        return userState?.settings?.tool?.uninstalledBuiltinTools ?? [];
       },
       {
         fallbackData: [],
         onSuccess: (data) => {
           this.#set(
-            { installedBuiltinTools: data, installedBuiltinToolsLoading: false },
+            { uninstalledBuiltinTools: data, uninstalledBuiltinToolsLoading: false },
             false,
-            n('useFetchInstalledBuiltinTools'),
+            n('useFetchUninstalledBuiltinTools'),
           );
         },
         revalidateOnFocus: false,

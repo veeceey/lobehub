@@ -3,9 +3,9 @@ import type { UserInterventionConfig } from '../../tool';
 export interface UserToolConfig {
   humanIntervention?: UserInterventionConfig;
   /**
-   * List of builtin tool identifiers that have been installed by the user.
-   * By default, no builtin tools are installed. Users need to explicitly
-   * install the tools they want to use.
+   * List of builtin tool identifiers that have been uninstalled by the user.
+   * By default, all builtin tools are enabled. Users can explicitly
+   * uninstall tools they don't want to use.
    */
-  installedBuiltinTools?: string[];
+  uninstalledBuiltinTools?: string[];
 }
