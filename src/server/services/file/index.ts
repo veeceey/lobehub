@@ -102,10 +102,21 @@ export class FileService {
   }
 
   /**
-   * Upload media file
+   * Upload media file (images only)
    */
   public async uploadMedia(key: string, buffer: Buffer): Promise<{ key: string }> {
     return this.impl.uploadMedia(key, buffer);
+  }
+
+  /**
+   * Upload buffer with specified content type (for any file type)
+   */
+  public async uploadBuffer(
+    key: string,
+    buffer: Buffer,
+    contentType: string,
+  ): Promise<{ key: string }> {
+    return this.impl.uploadBuffer(key, buffer, contentType);
   }
 
   /**

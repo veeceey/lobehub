@@ -377,6 +377,89 @@ Nested content`;
 
       expect(result.manifest.name).toBe('root-skill');
     });
+
+    // Fix: https://linear.app/lobehub/issue/LOBE-4756
+    // When importing from GitHub URL like https://github.com/openclaw/openclaw/tree/main/skills/skill-creator,
+    // the downloaded ZIP has structure: openclaw-main/skills/skill-creator/SKILL.md
+    // parseZipPackage should accept a basePath parameter to look in the correct subdirectory
+    it('should find SKILL.md in deep subdirectory when basePath is provided (GitHub subdirectory import)', async () => {
+      const skillMd = `---
+name: skill-creator
+description: A skill in deep subdirectory
+---
+Deep nested content`;
+
+      // Simulate GitHub ZIP structure: repo-branch/path/to/skill/SKILL.md
+      const testFiles = {
+        'openclaw-main/README.md': new TextEncoder().encode('# OpenClaw'),
+        'openclaw-main/skills/other-skill/SKILL.md': new TextEncoder().encode(
+          '---\nname: other\ndescription: other\n---\nOther',
+        ),
+        'openclaw-main/skills/skill-creator/SKILL.md': new TextEncoder().encode(skillMd),
+        'openclaw-main/skills/skill-creator/resources/template.md': new TextEncoder().encode(
+          'Template',
+        ),
+      };
+
+      const zipped = await createZip(testFiles);
+
+      // parseZipPackage should accept a basePath parameter to specify which subdirectory to look in
+      const result = await parser.parseZipPackage(Buffer.from(zipped), {
+        basePath: 'skills/skill-creator',
+      });
+
+      expect(result.manifest.name).toBe('skill-creator');
+      expect(result.content).toBe('Deep nested content');
+      expect(result.resources.has('resources/template.md')).toBe(true);
+    });
+
+    it('should work with basePath having leading/trailing slashes', async () => {
+      const skillMd = `---
+name: test-skill
+description: Test skill
+---
+Content`;
+
+      const testFiles = {
+        'repo-main/path/to/skill/SKILL.md': new TextEncoder().encode(skillMd),
+      };
+
+      const zipped = await createZip(testFiles);
+
+      // Test with leading slash
+      const result1 = await parser.parseZipPackage(Buffer.from(zipped), {
+        basePath: '/path/to/skill/',
+      });
+      expect(result1.manifest.name).toBe('test-skill');
+
+      // Test with trailing slash
+      const result2 = await parser.parseZipPackage(Buffer.from(zipped), {
+        basePath: 'path/to/skill/',
+      });
+      expect(result2.manifest.name).toBe('test-skill');
+    });
+
+    it('should fallback to default behavior when basePath is not provided', async () => {
+      const skillMd = `---
+name: root-skill
+description: Root skill
+---
+Root content`;
+
+      const testFiles = {
+        'repo-main/SKILL.md': new TextEncoder().encode(skillMd),
+        'repo-main/nested/SKILL.md': new TextEncoder().encode(
+          '---\nname: nested\ndescription: nested\n---\nNested',
+        ),
+      };
+
+      const zipped = await createZip(testFiles);
+
+      // Without basePath, should find the first-level SKILL.md
+      const result = await parser.parseZipPackage(Buffer.from(zipped));
+
+      expect(result.manifest.name).toBe('root-skill');
+    });
   });
 
   describe('parseZipFile', () => {

@@ -19,7 +19,9 @@ const mockSkillModel = {
 };
 
 const mockFileService = {
+  createFileRecord: vi.fn().mockResolvedValue({ fileId: 'mock-file-id', url: '/f/mock-file-id' }),
   downloadFileToLocal: vi.fn(),
+  uploadBuffer: vi.fn().mockResolvedValue({ key: 'mock-key' }),
 };
 
 const mockParser = {

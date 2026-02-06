@@ -7,6 +7,7 @@ vi.mock('@/server/services/file', () => ({
   FileService: vi.fn().mockImplementation(() => ({
     createFileRecord: vi.fn().mockResolvedValue({ fileId: 'mock-file-id', url: '/f/mock-file-id' }),
     getFileContent: vi.fn().mockResolvedValue('file content'),
+    uploadBuffer: vi.fn().mockResolvedValue({ key: 'mock-key' }),
     uploadMedia: vi.fn().mockResolvedValue({ key: 'mock-key' }),
   })),
 }));

@@ -38,8 +38,46 @@ describe('GitHub', () => {
       expect(result).toEqual({
         branch: 'feature',
         owner: 'lobehub',
+        path: 'new-ui/src/components',
         repo: 'lobe-chat',
       });
+    });
+
+    // Fix: https://linear.app/lobehub/issue/LOBE-4756
+    // When URL contains subdirectory path like /tree/main/skills/skill-creator,
+    // the path should be captured and returned
+    it('should capture subdirectory path from GitHub URL', () => {
+      const result = gh.parseRepoUrl(
+        'https://github.com/openclaw/openclaw/tree/main/skills/skill-creator',
+      );
+      expect(result).toEqual({
+        branch: 'main',
+        owner: 'openclaw',
+        path: 'skills/skill-creator',
+        repo: 'openclaw',
+      });
+    });
+
+    it('should capture nested subdirectory path from GitHub URL', () => {
+      const result = gh.parseRepoUrl(
+        'https://github.com/lobehub/skills/tree/develop/agents/coding/python-expert',
+      );
+      expect(result).toEqual({
+        branch: 'develop',
+        owner: 'lobehub',
+        path: 'agents/coding/python-expert',
+        repo: 'skills',
+      });
+    });
+
+    it('should not have path when URL has no subdirectory', () => {
+      const result = gh.parseRepoUrl('https://github.com/lobehub/lobe-chat/tree/main');
+      expect(result).toEqual({
+        branch: 'main',
+        owner: 'lobehub',
+        repo: 'lobe-chat',
+      });
+      expect(result.path).toBeUndefined();
     });
 
     it('should parse GitHub URL without protocol', () => {

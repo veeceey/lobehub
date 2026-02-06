@@ -153,12 +153,20 @@ export class S3 {
     });
   }
 
-  // Add a new method for uploading binary content
-  public async uploadBuffer(path: string, buffer: Buffer, contentType?: string) {
+  /**
+   * Upload buffer with specified content type
+   */
+  public async uploadBuffer(
+    path: string,
+    buffer: Buffer,
+    contentType?: string,
+    cacheControl?: string,
+  ) {
     const command = new PutObjectCommand({
       ACL: this.setAcl ? 'public-read' : undefined,
       Body: buffer,
       Bucket: this.bucket,
+      CacheControl: cacheControl,
       ContentType: contentType,
       Key: path,
     });
@@ -177,17 +185,13 @@ export class S3 {
     return this.client.send(command);
   }
 
+  /**
+   * Upload media file (images only) with long-term cache
+   */
   public async uploadMedia(key: string, buffer: Buffer) {
-    const command = new PutObjectCommand({
-      ACL: this.setAcl ? 'public-read' : undefined,
-      Body: buffer,
-      Bucket: this.bucket,
-      CacheControl: `public, max-age=${YEAR}`,
-      ContentType: inferContentTypeFromImageUrl(key)!,
-      Key: key,
-    });
-
-    await this.client.send(command);
+    const contentType = inferContentTypeFromImageUrl(key)!;
+    const cacheControl = `public, max-age=${YEAR}`;
+    await this.uploadBuffer(key, buffer, contentType, cacheControl);
   }
 }
 

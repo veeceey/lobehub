@@ -11,6 +11,15 @@ import { readFile } from 'node:fs/promises';
 
 import { SkillManifestError, SkillParseError } from './errors';
 
+export interface ParseZipOptions {
+  /**
+   * Base path within the ZIP to look for SKILL.md
+   * Used when importing from GitHub subdirectory URLs like:
+   * https://github.com/owner/repo/tree/main/skills/skill-name
+   */
+  basePath?: string;
+}
+
 export class SkillParser {
   /**
    * Parse SKILL.md file content
@@ -53,14 +62,15 @@ export class SkillParser {
   /**
    * Parse ZIP package
    * @param buffer - ZIP file Buffer
+   * @param options - Optional parsing options including basePath for subdirectory imports
    * @returns Parsed manifest, content, resource file mapping and ZIP hash
    */
-  async parseZipPackage(buffer: Buffer): Promise<ParsedZipSkill> {
+  async parseZipPackage(buffer: Buffer, options?: ParseZipOptions): Promise<ParsedZipSkill> {
     try {
       const unzipped = await this.unzipBuffer(buffer);
 
-      // Find SKILL.md (support root directory or first-level subdirectory)
-      const { skillMdContent, skillMdPath } = this.findSkillMd(unzipped);
+      // Find SKILL.md (support root directory, first-level subdirectory, or specified basePath)
+      const { skillMdContent, skillMdPath } = this.findSkillMd(unzipped, options?.basePath);
       if (!skillMdPath) {
         throw new SkillParseError('SKILL.md not found in zip package');
       }
@@ -114,12 +124,48 @@ export class SkillParser {
    * Supports:
    * - Root directory: SKILL.md
    * - First-level subdirectory: skill-name/SKILL.md
+   * - GitHub subdirectory with basePath: repo-branch/basePath/SKILL.md
    */
-  private findSkillMd(unzipped: Record<string, Uint8Array>): {
+  private findSkillMd(
+    unzipped: Record<string, Uint8Array>,
+    basePath?: string,
+  ): {
     skillMdContent: string;
     skillMdPath: string | null;
   } {
     const decoder = new TextDecoder();
+
+    // If basePath is provided (GitHub subdirectory import), look in that specific path
+    if (basePath) {
+      // GitHub ZIP structure: {repo}-{branch}/path/to/SKILL.md
+      // We need to find the root directory prefix first (e.g., "openclaw-main/")
+      const allPaths = Object.keys(unzipped);
+      const rootPrefix = this.findGitHubRootPrefix(allPaths);
+
+      if (rootPrefix) {
+        // Construct the full path: rootPrefix + basePath + /SKILL.md
+        const normalizedBasePath = basePath.replaceAll(/^\/|\/$/g, ''); // Remove leading/trailing slashes
+        const targetPath = `${rootPrefix}${normalizedBasePath}/SKILL.md`;
+
+        if (unzipped[targetPath]) {
+          return {
+            skillMdContent: decoder.decode(unzipped[targetPath]),
+            skillMdPath: targetPath,
+          };
+        }
+      }
+
+      // Fallback: try to find SKILL.md that contains the basePath
+      const basePathPattern = new RegExp(`^[^/]+/${basePath.replaceAll(/^\/|\/$/g, '')}/SKILL\\.md$`);
+      const matchWithBasePath = allPaths.find((path) => basePathPattern.test(path));
+
+      if (matchWithBasePath) {
+        return {
+          skillMdContent: decoder.decode(unzipped[matchWithBasePath]),
+          skillMdPath: matchWithBasePath,
+        };
+      }
+    }
 
     // Check root directory first
     if (unzipped['SKILL.md']) {
@@ -141,6 +187,21 @@ export class SkillParser {
     }
 
     return { skillMdContent: '', skillMdPath: null };
+  }
+
+  /**
+   * Find the GitHub ZIP root prefix (e.g., "repo-branch/")
+   * GitHub ZIPs have structure: {repo}-{branch}/...
+   */
+  private findGitHubRootPrefix(paths: string[]): string | null {
+    // Find first directory-like path
+    for (const path of paths) {
+      const firstSlash = path.indexOf('/');
+      if (firstSlash > 0) {
+        return path.slice(0, firstSlash + 1);
+      }
+    }
+    return null;
   }
 
   /**

@@ -1,6 +1,15 @@
+import debug from 'debug';
+
+const log = debug('lobe-chat:module:github');
+
 export interface GitHubRepoInfo {
   branch: string;
   owner: string;
+  /**
+   * Subdirectory path within the repository (e.g., 'skills/skill-creator')
+   * Extracted from URLs like: https://github.com/owner/repo/tree/branch/path/to/dir
+   */
+  path?: string;
   repo: string;
 }
 
@@ -16,7 +25,7 @@ export class GitHub {
   }
 
   /**
-   * Parse GitHub URL to extract owner, repo, and branch
+   * Parse GitHub URL to extract owner, repo, branch, and optional path
    * Supports multiple formats:
    * - https://github.com/owner/repo
    * - https://github.com/owner/repo/tree/branch
@@ -26,27 +35,41 @@ export class GitHub {
    * - https://github.com/owner/repo.git
    */
   parseRepoUrl(url: string, defaultBranch = 'main'): GitHubRepoInfo {
+    log('parseRepoUrl: input url=%s, defaultBranch=%s', url, defaultBranch);
+
     // Handle shorthand format: owner/repo
     if (/^[\w.-]+\/[\w.-]+$/.test(url)) {
       const [owner, repo] = url.split('/');
-      return { branch: defaultBranch, owner, repo };
+      const result = { branch: defaultBranch, owner, repo };
+      log('parseRepoUrl: matched shorthand format, result=%o', result);
+      return result;
     }
 
     // Handle full URL formats
+    // Capture: owner, repo, branch, and optional path after branch
     const match = url.match(
-      /(?:https?:\/\/)?github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/tree\/([^/]+))?(?:\/.*)?$/,
+      /(?:https?:\/\/)?github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/tree\/([^/]+)(?:\/(.+))?)?$/,
     );
 
     if (!match) {
+      log('parseRepoUrl: failed to parse url=%s', url);
       throw new GitHubParseError(`Invalid GitHub URL format: ${url}`);
     }
 
-    const [, owner, repo, branch] = match;
-    return {
+    const [, owner, repo, branch, path] = match;
+    const result: GitHubRepoInfo = {
       branch: branch || defaultBranch,
       owner,
       repo: repo.replace(/\.git$/, ''),
     };
+
+    // Add path if it exists (subdirectory within the repo)
+    if (path) {
+      result.path = path;
+    }
+
+    log('parseRepoUrl: matched full URL format, result=%o', result);
+    return result;
   }
 
   /**
@@ -68,6 +91,7 @@ export class GitHub {
    */
   async downloadRepoZip(info: GitHubRepoInfo): Promise<Buffer> {
     const zipUrl = this.buildRepoZipUrl(info);
+    log('downloadRepoZip: fetching url=%s', zipUrl);
 
     const response = await fetch(zipUrl, {
       headers: {
@@ -75,19 +99,25 @@ export class GitHub {
       },
     });
 
+    log('downloadRepoZip: response status=%d, ok=%s', response.status, response.ok);
+
     if (!response.ok) {
       if (response.status === 404) {
+        log('downloadRepoZip: repository not found');
         throw new GitHubNotFoundError(
           `Repository not found: ${info.owner}/${info.repo}@${info.branch}`,
         );
       }
+      log('downloadRepoZip: download failed with status=%d', response.status);
       throw new GitHubDownloadError(
         `Failed to download repository: ${response.status} ${response.statusText}`,
       );
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    return Buffer.from(arrayBuffer);
+    const buffer = Buffer.from(arrayBuffer);
+    log('downloadRepoZip: downloaded %d bytes', buffer.length);
+    return buffer;
   }
 
   /**

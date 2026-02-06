@@ -11,6 +11,9 @@ export const skillManifestSchema = z
   .object({
     author: skillAuthorSchema.optional(),
 
+    // Required: skill description
+    description: z.string().min(1, 'Skill description is required'),
+
     // Skill's specific Git location (supports subdirectory)
     // e.g. https://github.com/lobehub/skills/tree/main/code-review
     gitUrl: z.string().url().optional(),
