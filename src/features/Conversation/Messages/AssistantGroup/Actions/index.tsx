@@ -119,6 +119,8 @@ const WithContentId = memo<GroupActionsProps>(({ actionsConfig, id, data, conten
     defaultActions.copy,
     collapseAction,
     defaultActions.divider,
+    defaultActions.tts,
+    defaultActions.translate,
     defaultActions.share,
     defaultActions.divider,
     defaultActions.regenerate,
